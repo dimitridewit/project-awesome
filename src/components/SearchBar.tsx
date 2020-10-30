@@ -4,7 +4,7 @@ import React, {
   FormEvent,
   useEffect
 } from "react";
-import UseDebounce from "../hooks/UseDebounce";
+import useDebounce from "../hooks/UseDebounce";
 
 type searchResult = {
   value: string;
@@ -26,10 +26,10 @@ const search = (query: string): Promise<searchResult[]> => {
 
 const SearchBar: FunctionComponent = () => {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<searchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const debouncedQuery = UseDebounce(query, 500);
+  const debouncedQuery = useDebounce(query, 500);
 
   const onSubmitHandler = (e: FormEvent) => {
     e.preventDefault();
@@ -42,7 +42,7 @@ const SearchBar: FunctionComponent = () => {
 
       search(debouncedQuery).then(results => {
         setIsSearching(false);
-        // setResults(results) // fails on some typescript error
+        setResults(results); // fails on some typescript error
         console.log(results);
       });
     } else {
@@ -61,7 +61,11 @@ const SearchBar: FunctionComponent = () => {
         <button type="submit">Search!</button>
       </form>
       {isSearching && <span>Searching...</span>}
-      <div className="results"></div>
+      <div className="results">
+        {results.map(result => {
+          return <div>{result.value}</div>;
+        })}
+      </div>
     </div>
   );
 };
